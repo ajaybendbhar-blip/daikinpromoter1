@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promoter Competition Submission</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f6f6f6; }
+    .wrap { max-width: 860px; margin: auto; padding: 16px; }
+    .box { background: #fff; border: 1px solid #ddd; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    input, select, textarea, button {
+      width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px;
+    }
+    textarea { min-height: 80px; }
+    button { background: #01696f; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+    .secondary { background: #ddd; color: #222; }
+    .danger { background: #f7dfe4; color: #91233a; }
+    .row { border: 1px solid #ddd; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .msg { display:none; padding:12px; border-radius:10px; margin-bottom:12px; }
+    .ok { display:block; background:#e3f5f1; color:#0d4f55; }
+    .err { display:block; background:#fbe5e9; color:#91233a; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="box">
+    <h2>Promoter Competition Submission</h2>
+    <div id="msg" class="msg"></div>
+  </div>
+
+  <div class="box">
+    <h3>One-time basic details</h3>
+    <div class="grid">
+      <input id="promoterName" placeholder="Promoter Name">
+      <input id="employeeCode" placeholder="Promoter Employee Code">
+      <input id="storeName" placeholder="Store Name">
+      <input id="storeCode" placeholder="Store Code">
+      <select id="dealerCategory">
+        <option value="">Dealer Category</option>
+        <option>NR</option>
+        <option>GT</option>
+        <option>DSP</option>
+      </select>
+      <input id="storeCity" placeholder="Store City">
+      <textarea id="storeAddress" placeholder="Store Address" style="grid-column:1/-1;"></textarea>
+    </div>
+  </div>
+
+  <div class="box">
+    <h3>Segment-wise entry</h3>
+    <div class="grid">
+      <select id="segment">
+        <option value="">Select Segment</option>
+        <option>1T 3*</option>
+        <option>1.5T 3*</option>
+        <option>1T 5*</option>
+        <option>1.5T 5*</option>
+      </select>
+
+      <select id="brand">
+        <option value="">Select Brand</option>
+      </select>
+
+      <select id="model">
+        <option value="">Select Model</option>
+      </select>
+
+      <input id="price" type="number" placeholder="Best Customer Price">
+    </div>
+    <br>
+    <button type="button" onclick="addEntry()">Save This Entry</button>
+  </div>
+
+  <div class="box">
+    <h3>Saved entries</h3>
+    <div id="entries"></div>
+  </div>
+
+  <div class="box">
+    <button type="button" onclick="submitFinal()">Final Submit</button>
+  </div>
+
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJJUN-5WctpTcJy0ob7sRZE1XuDIbaBKH6u1FKBbZHbqfvTHZH-i3ffvMGZblLZtH80A/exec';
+
+const modelMaster = {
+  '1T 3*': {
+    'Daikin': ['MTKM35U', 'FTKL35U'],
+    'LG': ['US-Q13JNYE', 'RS-Q13JNYE'],
+    'Voltas': ['183V Vectra', '123V Vertis'],
+    'Bluestar': ['IC312TNUR', 'IA312DNU'],
+    'Hitachi': ['3400FXL', '3400FRS'],
+    'Panasonic': ['CU/CS-XU12', 'CU/CS-PU12'],
+    'Llyod': ['GLS12I3FWAEV', 'GLW12B3XWSEW']
+  },
+  '1.5T 3*': {
+    'Daikin': ['MTKL50U', 'FTKL50U'],
+    'LG': ['US-Q18JNXE', 'RS-Q18JNXE'],
+    'Voltas': ['183V Vectra Elite', '183V Vertis'],
+    'Bluestar': ['IC318TNU', 'IA318DNU'],
+    'Hitachi': ['518PCAISL', '518PCAIB'],
+    'Panasonic': ['CU/CS-PU18', 'CU/CS-XU18'],
+    'Llyod': ['GLS18I3FWAEV', 'GLW18B3XWSEW']
+  },
+  '1T 5*': {
+    'Daikin': ['MTKM35V', 'FTKM35V'],
+    'LG': ['US-Q13HNZE', 'RS-Q13HNZE'],
+    'Voltas': ['125V Vectra', '125V Vertis'],
+    'Bluestar': ['IC512YNU', 'IA512DNU'],
+    'Hitachi': ['3400FOS', '3400FSL'],
+    'Panasonic': ['CU/CS-XU12AKY', 'CU/CS-NU12'],
+    'Llyod': ['GLS12I5FWBEV', 'GLW12C5XWSEW']
+  },
+  '1.5T 5*': {
+    'Daikin': ['MTKM50V', 'FTKM50V'],
+    'LG': ['US-Q19HNZE', 'RS-Q19HNZE'],
+    'Voltas': ['185V Vectra', '185V Vertis'],
+    'Bluestar': ['IC518YNU', 'IA518DNU'],
+    'Hitachi': ['518FOBISL', '518FOBIB'],
+    'Panasonic': ['CU/CS-XU18AKY', 'CU/CS-NU18'],
+    'Llyod': ['GLS18I5FWBEV', 'GLW18C5XWSEW']
+  }
+};
+
+let savedEntries = [];
+
+function showMsg(text, type='ok') {
+  const el = document.getElementById('msg');
+  el.className = 'msg ' + (type === 'error' ? 'err' : 'ok');
+  el.textContent = text;
+}
+
+document.getElementById('segment').addEventListener('change', function() {
+  const segment = this.value;
+  const brandEl = document.getElementById('brand');
+  const modelEl = document.getElementById('model');
+
+  brandEl.innerHTML = '<option value="">Select Brand</option>';
+  modelEl.innerHTML = '<option value="">Select Model</option>';
+
+  if (!segment || !modelMaster[segment]) return;
+
+  Object.keys(modelMaster[segment]).forEach(brand => {
+    const opt = document.createElement('option');
+    opt.value = brand;
+    opt.textContent = brand;
+    brandEl.appendChild(opt);
+  });
+});
+
+document.getElementById('brand').addEventListener('change', function() {
+  const segment = document.getElementById('segment').value;
+  const brand = this.value;
+  const modelEl = document.getElementById('model');
+
+  modelEl.innerHTML = '<option value="">Select Model</option>';
+
+  if (!segment || !brand || !modelMaster[segment] || !modelMaster[segment][brand]) return;
+
+  modelMaster[segment][brand].forEach(model => {
+    const opt = document.createElement('option');
+    opt.value = model;
+    opt.textContent = model;
+    modelEl.appendChild(opt);
+  });
+});
+
+function addEntry() {
+  const segment = document.getElementById('segment').value.trim();
+  const brand = document.getElementById('brand').value.trim();
+  const model = document.getElementById('model').value.trim();
+  const price = document.getElementById('price').value.trim();
+
+  if (!segment || !brand || !model || !price) {
+    showMsg('Please select segment, brand, model and enter best customer price.', 'error');
+    return;
+  }
+
+  savedEntries.push({ segment, brand, model, price });
+  renderEntries();
+
+  document.getElementById('segment').value = '';
+  document.getElementById('brand').innerHTML = '<option value="">Select Brand</option>';
+  document.getElementById('model').innerHTML = '<option value="">Select Model</option>';
+  document.getElementById('price').value = '';
+
+  showMsg('Entry saved. Continue with next segment or brand.');
+}
+
+function renderEntries() {
+  const box = document.getElementById('entries');
+  if (!savedEntries.length) {
+    box.innerHTML = '<div class="row">No entries saved yet.</div>';
+    return;
+  }
+
+  box.innerHTML = savedEntries.map((r, i) => `
+    <div class="row">
+      <strong>${r.segment}</strong><br>
+      ${r.brand} | ${r.model} | ₹ ${r.price}<br><br>
+      <button type="button" class="danger" onclick="deleteEntry(${i})">Delete</button>
+    </div>
+  `).join('');
+}
+
+function deleteEntry(index) {
+  savedEntries.splice(index, 1);
+  renderEntries();
+  showMsg('Entry deleted.');
+}
+
+function validateTopDetails() {
+  return document.getElementById('promoterName').value.trim() &&
+         document.getElementById('employeeCode').value.trim() &&
+         document.getElementById('storeName').value.trim() &&
+         document.getElementById('storeCode').value.trim() &&
+         document.getElementById('dealerCategory').value.trim() &&
+         document.getElementById('storeCity').value.trim() &&
+         document.getElementById('storeAddress').value.trim();
+}
+
+function submitOneRow(entry, callback) {
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = SCRIPT_URL;
+  form.target = 'hidden_iframe';
+  form.style.display = 'none';
+
+  const payload = {
+    promoter: document.getElementById('promoterName').value.trim(),
+    employeeCode: document.getElementById('employeeCode').value.trim(),
+    storeName: document.getElementById('storeName').value.trim(),
+    storeCode: document.getElementById('storeCode').value.trim(),
+    dealerCategory: document.getElementById('dealerCategory').value.trim(),
+    storeCity: document.getElementById('storeCity').value.trim(),
+    storeAddress: document.getElementById('storeAddress').value.trim(),
+    segment: entry.segment,
+    brand: entry.brand,
+    model: entry.model,
+    price: entry.price,
+    daikinDisplay: '',
+    storeDisplay: ''
+  };
+
+  Object.keys(payload).forEach(key => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
+    input.value = payload[key];
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(() => {
+    document.body.removeChild(form);
+    callback();
+  }, 800);
+}
+
+function submitFinal() {
+  if (!validateTopDetails()) {
+    showMsg('Please fill all one-time basic details.', 'error');
+    return;
+  }
+
+  if (!savedEntries.length) {
+    showMsg('Please save at least one entry before final submit.', 'error');
+    return;
+  }
+
+  showMsg('Submitting all saved entries, please wait...');
+
+  let i = 0;
+  function next() {
+    if (i >= savedEntries.length) {
+      showMsg('Final submission completed. All entries submitted.');
+      savedEntries = [];
+      renderEntries();
+      return;
+    }
+    submitOneRow(savedEntries[i], function() {
+      i++;
+      next();
+    });
+  }
+  next();
+}
+
+renderEntries();
+</script>
+</body>
+</html>
