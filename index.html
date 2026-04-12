@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promoter Competition Submission</title>
+  <title>Daikin Market Masters</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f6f6f6; }
     .wrap { max-width: 860px; margin: auto; padding: 16px; }
@@ -14,19 +14,19 @@
     }
     textarea { min-height: 80px; }
     button { background: #01696f; color: #fff; border: none; font-weight: bold; cursor: pointer; }
-    .secondary { background: #ddd; color: #222; }
     .danger { background: #f7dfe4; color: #91233a; }
     .row { border: 1px solid #ddd; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
     .msg { display:none; padding:12px; border-radius:10px; margin-bottom:12px; }
     .ok { display:block; background:#e3f5f1; color:#0d4f55; }
     .err { display:block; background:#fbe5e9; color:#91233a; }
+    h2, h3 { margin-top: 0; }
     @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 <div class="wrap">
   <div class="box">
-    <h2>Promoter Competition Submission</h2>
+    <h2>Daikin Market Masters</h2>
     <div id="msg" class="msg"></div>
   </div>
 
@@ -79,18 +79,22 @@
   </div>
 
   <div class="box">
-    <button type="button" onclick="submitFinal()">Final Submit</button>
+    <h3>Store Information</h3>
+    <div class="grid">
+      <input id="totalCounterDisplay" type="number" placeholder="Total Counter Split AC Display">
+      <input id="daikinSplitDisplay" type="number" placeholder="Daikin Split AC Display">
+    </div>
   </div>
 
-  <iframe name="hidden_iframe" style="display:none;"></iframe>
+  <div class="box">
+    <button type="button" onclick="submitFinal()">Final Submit</button>
+  </div>
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzJJUN-5WctpTcJy0ob7sRZE1XuDIbaBKH6u1FKBbZHbqfvTHZH-i3ffvMGZblLZtH80A/exec';
-
 const modelMaster = {
   '1T 3*': {
-    'Daikin': ['MTKM35U', 'FTKL35U'],
+    'Daikin': ['ATKL35XV', 'FTKL35XV', 'FTKC35XV'],
     'LG': ['US-Q13JNYE', 'RS-Q13JNYE'],
     'Voltas': ['183V Vectra', '123V Vertis'],
     'Bluestar': ['IC312TNUR', 'IA312DNU'],
@@ -99,7 +103,7 @@ const modelMaster = {
     'Llyod': ['GLS12I3FWAEV', 'GLW12B3XWSEW']
   },
   '1.5T 3*': {
-    'Daikin': ['MTKL50U', 'FTKL50U'],
+    'Daikin': ['ATKL50XV', 'FTKL50XV', 'FTKC50XV'],
     'LG': ['US-Q18JNXE', 'RS-Q18JNXE'],
     'Voltas': ['183V Vectra Elite', '183V Vertis'],
     'Bluestar': ['IC318TNU', 'IA318DNU'],
@@ -108,7 +112,7 @@ const modelMaster = {
     'Llyod': ['GLS18I3FWAEV', 'GLW18B3XWSEW']
   },
   '1T 5*': {
-    'Daikin': ['MTKM35V', 'FTKM35V'],
+    'Daikin': ['ATKM35XV', 'FTKM35XV','FTKU35XV'],
     'LG': ['US-Q13HNZE', 'RS-Q13HNZE'],
     'Voltas': ['125V Vectra', '125V Vertis'],
     'Bluestar': ['IC512YNU', 'IA512DNU'],
@@ -117,7 +121,7 @@ const modelMaster = {
     'Llyod': ['GLS12I5FWBEV', 'GLW12C5XWSEW']
   },
   '1.5T 5*': {
-    'Daikin': ['MTKM50V', 'FTKM50V'],
+    'Daikin': ['ATKM50XV', 'FTKM50XV','FTKU50XV'],
     'LG': ['US-Q19HNZE', 'RS-Q19HNZE'],
     'Voltas': ['185V Vectra', '185V Vertis'],
     'Bluestar': ['IC518YNU', 'IA518DNU'],
@@ -223,80 +227,9 @@ function validateTopDetails() {
          document.getElementById('storeCity').value.trim() &&
          document.getElementById('storeAddress').value.trim();
 }
-
-function submitOneRow(entry, callback) {
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = SCRIPT_URL;
-  form.target = 'hidden_iframe';
-  form.style.display = 'none';
-
-  const payload = {
-    promoter: document.getElementById('promoterName').value.trim(),
-    employeeCode: document.getElementById('employeeCode').value.trim(),
-    storeName: document.getElementById('storeName').value.trim(),
-    storeCode: document.getElementById('storeCode').value.trim(),
-    dealerCategory: document.getElementById('dealerCategory').value.trim(),
-    storeCity: document.getElementById('storeCity').value.trim(),
-    storeAddress: document.getElementById('storeAddress').value.trim(),
-    segment: entry.segment,
-    brand: entry.brand,
-    model: entry.model,
-    price: entry.price,
-    daikinDisplay: '',
-    storeDisplay: ''
-  };
-
-  Object.keys(payload).forEach(key => {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = key;
-    input.value = payload[key];
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-
-  setTimeout(() => {
-    document.body.removeChild(form);
-    callback();
-  }, 800);
-}
-
-function submitFinal() {
-  if (!validateTopDetails()) {
-    showMsg('Please fill all one-time basic details.', 'error');
-    return;
-  }
-
-  if (!savedEntries.length) {
-    showMsg('Please save at least one entry before final submit.', 'error');
-    return;
-  }
-
-  showMsg('Submitting all saved entries, please wait...');
-
-  let i = 0;
-  function next() {
-    if (i >= savedEntries.length) {
-      showMsg('Final submission completed. All entries submitted.');
-      savedEntries = [];
-      renderEntries();
-      return;
-    }
-    submitOneRow(savedEntries[i], function() {
-      i++;
-      next();
-    });
-  }
-  next();
-}
-
-renderEntries();
 </script>
 
-  <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -321,12 +254,20 @@ renderEntries();
       return { status: 'error', message: err.message };
     }
   };
-   
 </script>
-  <script>
+
+<script>
 async function submitFinal() {
   if (!validateTopDetails()) {
     showMsg('Please fill all one-time basic details.', 'error');
+    return;
+  }
+
+  const totalCounterDisplay = document.getElementById('totalCounterDisplay').value.trim();
+  const daikinSplitDisplay = document.getElementById('daikinSplitDisplay').value.trim();
+
+  if (!totalCounterDisplay || !daikinSplitDisplay) {
+    showMsg('Please fill Store Information details.', 'error');
     return;
   }
 
@@ -335,30 +276,45 @@ async function submitFinal() {
     return;
   }
 
-  const payload = {
-    submittedAt: new Date().toISOString(),
-    promoterName: document.getElementById('promoterName').value.trim(),
-    employeeCode: document.getElementById('employeeCode').value.trim(),
-    storeName: document.getElementById('storeName').value.trim(),
-    storeCode: document.getElementById('storeCode').value.trim(),
-    dealerCategory: document.getElementById('dealerCategory').value.trim(),
-    storeCity: document.getElementById('storeCity').value.trim(),
-    storeAddress: document.getElementById('storeAddress').value.trim(),
-    entries: savedEntries
-  };
-
   showMsg('Submitting all saved entries, please wait...');
 
-  const result = await window.submitToFirebase(payload);
+  let successCount = 0;
 
-  if (result.status === 'success') {
-    showMsg('Final submission completed successfully.');
-    savedEntries = [];
-    renderEntries();
-  } else {
-    showMsg('Submission failed: ' + result.message, 'error');
+  for (const entry of savedEntries) {
+    const payload = {
+      submittedAt: new Date().toISOString(),
+      promoterName: document.getElementById('promoterName').value.trim(),
+      employeeCode: document.getElementById('employeeCode').value.trim(),
+      storeName: document.getElementById('storeName').value.trim(),
+      storeCode: document.getElementById('storeCode').value.trim(),
+      dealerCategory: document.getElementById('dealerCategory').value.trim(),
+      storeCity: document.getElementById('storeCity').value.trim(),
+      storeAddress: document.getElementById('storeAddress').value.trim(),
+      totalCounterDisplay: totalCounterDisplay,
+      daikinSplitDisplay: daikinSplitDisplay,
+      segment: entry.segment,
+      brand: entry.brand,
+      model: entry.model,
+      price: entry.price
+    };
+
+    const result = await window.submitToFirebase(payload);
+
+    if (result.status === 'success') {
+      successCount++;
+    } else {
+      showMsg('Submission failed: ' + result.message, 'error');
+      return;
+    }
   }
+
+  showMsg('Final submission completed successfully. Rows saved: ' + successCount);
+  savedEntries = [];
+  renderEntries();
+  document.getElementById('totalCounterDisplay').value = '';
+  document.getElementById('daikinSplitDisplay').value = '';
 }
+renderEntries();
 </script>
 </body>
 </html>
