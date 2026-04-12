@@ -301,13 +301,13 @@ renderEntries();
   import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_DATABASE_NAME-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyBy7bbeyV5Ox8KiNrqDJ5kCVMvFHFv8VLk",
+    authDomain: "daikinpromo-28d8a.firebaseapp.com",
+    databaseURL: "https://daikinpromo-28d8a-default-rtdb.firebaseio.com/",
+    projectId: "daikinpromo-28d8a",
+    storageBucket: "daikinpromo-28d8a.firebasestorage.app",
+    messagingSenderId: "949190921548",
+    appId: "1:949190921548:web:c1c9920190d4fa3ab153e9"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -321,6 +321,44 @@ renderEntries();
       return { status: 'error', message: err.message };
     }
   };
+   
+</script>
+  <script>
+async function submitFinal() {
+  if (!validateTopDetails()) {
+    showMsg('Please fill all one-time basic details.', 'error');
+    return;
+  }
+
+  if (!savedEntries.length) {
+    showMsg('Please save at least one entry before final submit.', 'error');
+    return;
+  }
+
+  const payload = {
+    submittedAt: new Date().toISOString(),
+    promoterName: document.getElementById('promoterName').value.trim(),
+    employeeCode: document.getElementById('employeeCode').value.trim(),
+    storeName: document.getElementById('storeName').value.trim(),
+    storeCode: document.getElementById('storeCode').value.trim(),
+    dealerCategory: document.getElementById('dealerCategory').value.trim(),
+    storeCity: document.getElementById('storeCity').value.trim(),
+    storeAddress: document.getElementById('storeAddress').value.trim(),
+    entries: savedEntries
+  };
+
+  showMsg('Submitting all saved entries, please wait...');
+
+  const result = await window.submitToFirebase(payload);
+
+  if (result.status === 'success') {
+    showMsg('Final submission completed successfully.');
+    savedEntries = [];
+    renderEntries();
+  } else {
+    showMsg('Submission failed: ' + result.message, 'error');
+  }
+}
 </script>
 </body>
 </html>
