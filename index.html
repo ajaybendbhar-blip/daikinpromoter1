@@ -83,6 +83,31 @@
     <div class="grid">
       <input id="totalCounterDisplay" type="number" placeholder="Total Counter Split AC Display">
       <input id="daikinSplitDisplay" type="number" placeholder="Daikin Split AC Display">
+
+      <select id="installationCharges">
+        <option value="">Installation Charges</option>
+        <option>Standard</option>
+        <option>Subsidized</option>
+        <option>Free</option>
+      </select>
+
+      <select id="pinelabActivation">
+        <option value="">Pinelab Activation</option>
+        <option>Y</option>
+        <option>N</option>
+      </select>
+
+      <select id="paytmActivation">
+        <option value="">Paytm Activation</option>
+        <option>Y</option>
+        <option>N</option>
+      </select>
+
+      <select id="paperFinance">
+        <option value="">Paper Finance</option>
+        <option>Y</option>
+        <option>N</option>
+      </select>
     </div>
   </div>
 
@@ -94,7 +119,7 @@
 <script>
 const modelMaster = {
   '1T 3*': {
-    'Daikin': ['ATKL35XV', 'FTKL35XV', 'FTKC35XV'],
+    'Daikin': ['ATKL35XV', 'FTKL35XV','FTKC35XV'],
     'LG': ['US-Q13JNYE', 'RS-Q13JNYE'],
     'Voltas': ['183V Vectra', '123V Vertis'],
     'Bluestar': ['IC312TNUR', 'IA312DNU'],
@@ -103,7 +128,7 @@ const modelMaster = {
     'Llyod': ['GLS12I3FWAEV', 'GLW12B3XWSEW']
   },
   '1.5T 3*': {
-    'Daikin': ['ATKL50XV', 'FTKL50XV', 'FTKC50XV'],
+    'Daikin': ['ATKL50XV', 'FTKL50XV','FTKC50XV'],
     'LG': ['US-Q18JNXE', 'RS-Q18JNXE'],
     'Voltas': ['183V Vectra Elite', '183V Vertis'],
     'Bluestar': ['IC318TNU', 'IA318DNU'],
@@ -112,7 +137,7 @@ const modelMaster = {
     'Llyod': ['GLS18I3FWAEV', 'GLW18B3XWSEW']
   },
   '1T 5*': {
-    'Daikin': ['ATKM35XV', 'FTKM35XV','FTKU35XV'],
+    'Daikin': ['MTKM35XV', 'FTKM35XV','FTKU35XV','JTKJ35XV'],
     'LG': ['US-Q13HNZE', 'RS-Q13HNZE'],
     'Voltas': ['125V Vectra', '125V Vertis'],
     'Bluestar': ['IC512YNU', 'IA512DNU'],
@@ -121,7 +146,7 @@ const modelMaster = {
     'Llyod': ['GLS12I5FWBEV', 'GLW12C5XWSEW']
   },
   '1.5T 5*': {
-    'Daikin': ['ATKM50XV', 'FTKM50XV','FTKU50XV'],
+    'Daikin': ['MTKM50XV', 'FTKM50XV','FTKU50XV','JTKJ50XV'],
     'LG': ['US-Q19HNZE', 'RS-Q19HNZE'],
     'Voltas': ['185V Vectra', '185V Vertis'],
     'Bluestar': ['IC518YNU', 'IA518DNU'],
@@ -265,9 +290,13 @@ async function submitFinal() {
 
   const totalCounterDisplay = document.getElementById('totalCounterDisplay').value.trim();
   const daikinSplitDisplay = document.getElementById('daikinSplitDisplay').value.trim();
+  const installationCharges = document.getElementById('installationCharges').value.trim();
+  const pinelabActivation = document.getElementById('pinelabActivation').value.trim();
+  const paytmActivation = document.getElementById('paytmActivation').value.trim();
+  const paperFinance = document.getElementById('paperFinance').value.trim();
 
-  if (!totalCounterDisplay || !daikinSplitDisplay) {
-    showMsg('Please fill Store Information details.', 'error');
+  if (!totalCounterDisplay || !daikinSplitDisplay || !installationCharges || !pinelabActivation || !paytmActivation || !paperFinance) {
+    showMsg('Please fill all Store Information details.', 'error');
     return;
   }
 
@@ -292,6 +321,10 @@ async function submitFinal() {
       storeAddress: document.getElementById('storeAddress').value.trim(),
       totalCounterDisplay: totalCounterDisplay,
       daikinSplitDisplay: daikinSplitDisplay,
+      installationCharges: installationCharges,
+      pinelabActivation: pinelabActivation,
+      paytmActivation: paytmActivation,
+      paperFinance: paperFinance,
       segment: entry.segment,
       brand: entry.brand,
       model: entry.model,
@@ -313,6 +346,10 @@ async function submitFinal() {
   renderEntries();
   document.getElementById('totalCounterDisplay').value = '';
   document.getElementById('daikinSplitDisplay').value = '';
+  document.getElementById('installationCharges').value = '';
+  document.getElementById('pinelabActivation').value = '';
+  document.getElementById('paytmActivation').value = '';
+  document.getElementById('paperFinance').value = '';
 }
 renderEntries();
 </script>
