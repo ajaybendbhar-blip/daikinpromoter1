@@ -30,22 +30,34 @@
     <div id="msg" class="msg"></div>
   </div>
 
+  <div class="box" id="loginBox">
+    <h3>Promoter Login</h3>
+    <div class="grid">
+      <input id="loginEmployeeCode" placeholder="Employee Code / Mobile Number">
+      <input id="loginPassword" type="password" placeholder="Password">
+    </div>
+    <br>
+    <button type="button" onclick="loginPromoter()">Login</button>
+  </div>
+
+  <div id="appContent" style="display:none;">
+
   <div class="box">
     <h3>One-time basic details</h3>
     <div class="grid">
-      <input id="promoterName" placeholder="Promoter Name">
-      <input id="employeeCode" placeholder="Promoter Employee Code">
-      <input id="storeName" placeholder="Store Name">
-      <input id="storeCode" placeholder="Store Code">
-      <select id="dealerCategory">
+      <input id="promoterName" readonly placeholder="Promoter Name">
+      <input id="employeeCode" readonly placeholder="Promoter Employee Code">
+      <input id="storeName" readonly placeholder="Store Name">
+      <input id="storeCode" readonly placeholder="Store Code">
+      <select id="dealerCategory" readonly>
         <option value="">Dealer Category</option>
         <option>NR</option>
         <option>GT</option>
         <option>DSP</option>
         <option>RR</option>
       </select>
-      <input id="storeCity" placeholder="Store City">
-      <textarea id="storeAddress" placeholder="Store Address" style="grid-column:1/-1;"></textarea>
+      <input id="storeCity" readonly placeholder="Store City">
+      <textarea id="storeAddress" readonly placeholder="Store Address" style="grid-column:1/-1;"></textarea>
     </div>
   </div>
 
@@ -657,6 +669,44 @@ function renderEntries() {
       <div style="margin-top:8px;"><button type="button" onclick="removeEntry(${idx})">Delete</button></div>
     </div>
   `).join('');
+}
+
+let loggedInPromoter = null;
+
+async function loginPromoter() {
+  const employeeCode = document.getElementById('loginEmployeeCode').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+
+  if (!employeeCode || !password) {
+    showMsg('Please enter employee code and password.', 'error');
+    return;
+  }
+
+  try {
+    const url = 'https://script.google.com/macros/s/AKfycbyF1tvgY_QcxV9SwY9I9QJjJkQBnQtSmCqtRNrX8S2a8J_dX5wsFMDNwQImV-JsHIyO/exec?employeeCode=' + encodeURIComponent(employeeCode) + '&password=' + encodeURIComponent(password);
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.success) {
+      showMsg(data.message || 'Login failed.', 'error');
+      return;
+    }
+
+    loggedInPromoter = data.employee;
+    document.getElementById('promoterName').value = data.employee.promoterName || '';
+    document.getElementById('employeeCode').value = data.employee.employeeCode || '';
+    document.getElementById('storeName').value = data.employee.storeName || '';
+    document.getElementById('storeCode').value = data.employee.storeCode || '';
+    document.getElementById('dealerCategory').value = data.employee.dealerCategory || '';
+    document.getElementById('storeCity').value = data.employee.storeCity || '';
+    document.getElementById('storeAddress').value = data.employee.storeAddress || '';
+
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    showMsg('Login successful. Store details loaded automatically.');
+  } catch (err) {
+    showMsg('Login error: ' + err.message, 'error');
+  }
 }
 
 function validateTopDetails() {
