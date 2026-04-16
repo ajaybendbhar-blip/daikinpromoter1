@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daikin Market Masters</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f6f6f6; }
+    .wrap { max-width: 860px; margin: auto; padding: 16px; }
+    .box { background: #fff; border: 1px solid #ddd; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    input, select, textarea, button {
+      width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px;
+    }
+    textarea { min-height: 80px; }
+    button { background: #01696f; color: #fff; border: none; font-weight: bold; cursor: pointer; }
+    .danger { background: #f7dfe4; color: #91233a; }
+    .row { border: 1px solid #ddd; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .msg { display:none; padding:12px; border-radius:10px; margin-bottom:12px; }
+    .ok { display:block; background:#e3f5f1; color:#0d4f55; }
+    .err { display:block; background:#fbe5e9; color:#91233a; }
+    h2, h3 { margin-top: 0; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="box">
+    <h2>Daikin Market Masters</h2>
+    <div id="msg" class="msg"></div>
+  </div>
+
+  <div class="box">
+    <h3>One-time basic details</h3>
+    <div class="grid">
+      <input id="promoterName" placeholder="Promoter Name">
+      <input id="employeeCode" placeholder="Promoter Employee Code">
+      <input id="storeName" placeholder="Store Name">
+      <input id="storeCode" placeholder="Store Code">
+      <select id="dealerCategory">
+        <option value="">Dealer Category</option>
+        <option>NR</option>
+        <option>GT</option>
+        <option>DSP</option>
+      </select>
+      <input id="storeCity" placeholder="Store City">
+      <textarea id="storeAddress" placeholder="Store Address" style="grid-column:1/-1;"></textarea>
+    </div>
+  </div>
+
+  <div class="box">
+    <h3>Segment-wise entry</h3>
+    <div class="grid">
+      <select id="segment">
+        <option value="">Select Segment</option>
+        <option>1T 3*</option>
+        <option>1.5T 3*</option>
+        <option>1T 5*</option>
+        <option>1.5T 5*</option>
+      </select>
+
+      <select id="brand">
+        <option value="">Select Brand</option>
+      </select>
+
+      <select id="model">
+        <option value="">Select Model</option>
+      </select>
+
+      <input id="price" type="number" placeholder="Best Customer Price">
+    </div>
+    <br>
+    <button type="button" onclick="addEntry()">Save This Entry</button>
+  </div>
+
+  <div class="box">
+    <h3>Saved entries</h3>
+    <div id="entries"></div>
+  </div>
+
+  <div class="box">
+    <h3>Store Information</h3>
+    <div class="grid">
+      <input id="totalCounterDisplay" type="number" placeholder="Total Counter Split AC Display">
+      <input id="daikinSplitDisplay" type="number" placeholder="Daikin Split AC Display">
+
+      <select id="installationCharges">
+        <option value="">Installation Charges</option>
+        <option>Standard</option>
+        <option>Subsidized</option>
+        <option>Free</option>
+      </select>
+
+      <select id="pinelabActivation">
+        <option value="">Pinelab Activation</option>
+        <option>Y</option>
+        <option>N</option>
+      </select>
+
+      <select id="paytmActivation">
+        <option value="">Paytm Activation</option>
+        <option>Y</option>
+        <option>N</option>
+      </select>
+
+      <select id="paperFinance">
+        <option value="">Paper Finance</option>
+        <option>Y</option>
+        <option>N</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="box">
+    <h3>Reference Customer Invoice</h3>
+    <div class="grid">
+      <div style="grid-column:1/-1;">
+        <label for="invoiceImage"><b>Upload Reference Customer Invoice</b> (Optional)</label>
+        <input id="invoiceImage" type="file" accept="image/*" capture="environment">
+        <small style="display:block;margin-top:6px;color:#666;">
+          Promoter can upload from computer, mobile gallery, or click a picture from camera.
+        </small>
+      </div>
+      <div style="grid-column:1/-1;">
+        <img id="invoicePreview" alt="Invoice Preview" style="max-width:260px; display:none; border:1px solid #ccc; border-radius:8px; margin-top:8px;">
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
+    <button type="button" onclick="submitFinal()">Final Submit</button>
+  </div>
+</div>
+
+<script>
+const modelMaster = {
+  '1T 3*': {
+    'Daikin': ['ATKL35XV', 'FTKL35XV','FTKC35XV'],
+    'LG': ['US-Q13JNYE', 'RS-Q13JNYE'],
+    'Voltas': ['183V Vectra', '123V Vertis'],
+    'Bluestar': ['IC312TNUR', 'IA312DNU'],
+    'Hitachi': ['3400FXL', '3400FRS'],
+    'Panasonic': ['CU/CS-XU12', 'CU/CS-PU12'],
+    'Llyod': ['GLS12I3FWAEV', 'GLW12B3XWSEW']
+  },
+  '1.5T 3*': {
+    'Daikin': ['ATKL50XV', 'FTKL50XV','FTKC50XV'],
+    'LG': ['US-Q18JNXE', 'RS-Q18JNXE'],
+    'Voltas': ['183V Vectra Elite', '183V Vertis'],
+    'Bluestar': ['IC318TNU', 'IA318DNU'],
+    'Hitachi': ['518PCAISL', '518PCAIB'],
+    'Panasonic': ['CU/CS-PU18', 'CU/CS-XU18'],
+    'Llyod': ['GLS18I3FWAEV', 'GLW18B3XWSEW']
+  },
+  '1T 5*': {
+    'Daikin': ['MTKM35XV', 'FTKM35XV','FTKU35XV','JTKJ35XV'],
+    'LG': ['US-Q13HNZE', 'RS-Q13HNZE'],
+    'Voltas': ['125V Vectra', '125V Vertis'],
+    'Bluestar': ['IC512YNU', 'IA512DNU'],
+    'Hitachi': ['3400FOS', '3400FSL'],
+    'Panasonic': ['CU/CS-XU12AKY', 'CU/CS-NU12'],
+    'Llyod': ['GLS12I5FWBEV', 'GLW12C5XWSEW']
+  },
+  '1.5T 5*': {
+    'Daikin': ['MTKM50XV', 'FTKM50XV','FTKU50XV','JTKJ50XV'],
+    'LG': ['US-Q19HNZE', 'RS-Q19HNZE'],
+    'Voltas': ['185V Vectra', '185V Vertis'],
+    'Bluestar': ['IC518YNU', 'IA518DNU'],
+    'Hitachi': ['518FOBISL', '518FOBIB'],
+    'Panasonic': ['CU/CS-XU18AKY', 'CU/CS-NU18'],
+    'Llyod': ['GLS18I5FWBEV', 'GLW18C5XWSEW']
+  }
+};
+
+let savedEntries = [];
+
+
+let invoiceImageBase64 = '';
+let invoiceImageMimeType = '';
+let invoiceImageName = '';
+
+document.getElementById('invoiceImage').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    showMsg('Please select only an image file for invoice.', 'error');
+    event.target.value = '';
+    invoiceImageBase64 = '';
+    invoiceImageMimeType = '';
+    invoiceImageName = '';
+    document.getElementById('invoicePreview').style.display = 'none';
+    return;
+  }
+
+  invoiceImageMimeType = file.type || 'image/jpeg';
+  invoiceImageName = file.name || ('invoice_' + Date.now() + '.jpg');
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const result = e.target.result;
+    invoiceImageBase64 = result.split(',')[1];
+
+    const preview = document.getElementById('invoicePreview');
+    preview.src = result;
+    preview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
+
+function showMsg(text, type='ok') {
+  const el = document.getElementById('msg');
+  el.className = 'msg ' + (type === 'error' ? 'err' : 'ok');
+  el.textContent = text;
+}
+
+document.getElementById('segment').addEventListener('change', function() {
+  const segment = this.value;
+  const brandEl = document.getElementById('brand');
+  const modelEl = document.getElementById('model');
+
+  brandEl.innerHTML = '<option value="">Select Brand</option>';
+  modelEl.innerHTML = '<option value="">Select Model</option>';
+
+  if (!segment || !modelMaster[segment]) return;
+
+  Object.keys(modelMaster[segment]).forEach(brand => {
+    const opt = document.createElement('option');
+    opt.value = brand;
+    opt.textContent = brand;
+    brandEl.appendChild(opt);
+  });
+});
+
+document.getElementById('brand').addEventListener('change', function() {
+  const segment = document.getElementById('segment').value;
+  const brand = this.value;
+  const modelEl = document.getElementById('model');
+
+  modelEl.innerHTML = '<option value="">Select Model</option>';
+
+  if (!segment || !brand || !modelMaster[segment] || !modelMaster[segment][brand]) return;
+
+  modelMaster[segment][brand].forEach(model => {
+    const opt = document.createElement('option');
+    opt.value = model;
+    opt.textContent = model;
+    modelEl.appendChild(opt);
+  });
+});
+
+function addEntry() {
+  const segment = document.getElementById('segment').value.trim();
+  const brand = document.getElementById('brand').value.trim();
+  const model = document.getElementById('model').value.trim();
+  const price = document.getElementById('price').value.trim();
+
+  if (!segment || !brand || !model || !price) {
+    showMsg('Please select segment, brand, model and enter best customer price.', 'error');
+    return;
+  }
+
+  savedEntries.push({ segment, brand, model, price });
+  renderEntries();
+
+  document.getElementById('segment').value = '';
+  document.getElementById('brand').innerHTML = '<option value="">Select Brand</option>';
+  document.getElementById('model').innerHTML = '<option value="">Select Model</option>';
+  document.getElementById('price').value = '';
+
+  showMsg('Entry saved. Continue with next segment or brand.');
+}
+
+function renderEntries() {
+  const box = document.getElementById('entries');
+  if (!savedEntries.length) {
+    box.innerHTML = '<div class="row">No entries saved yet.</div>';
+    return;
+  }
+
+  box.innerHTML = savedEntries.map((r, i) => `
+    <div class="row">
+      <strong>${r.segment}</strong><br>
+      ${r.brand} | ${r.model} | ₹ ${r.price}<br><br>
+      <button type="button" class="danger" onclick="deleteEntry(${i})">Delete</button>
+    </div>
+  `).join('');
+}
+
+function deleteEntry(index) {
+  savedEntries.splice(index, 1);
+  renderEntries();
+  showMsg('Entry deleted.');
+}
+
+function validateTopDetails() {
+  return document.getElementById('promoterName').value.trim() &&
+         document.getElementById('employeeCode').value.trim() &&
+         document.getElementById('storeName').value.trim() &&
+         document.getElementById('storeCode').value.trim() &&
+         document.getElementById('dealerCategory').value.trim() &&
+         document.getElementById('storeCity').value.trim() &&
+         document.getElementById('storeAddress').value.trim();
+}
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBy7bbeyV5Ox8KiNrqDJ5kCVMvFHFv8VLk",
+    authDomain: "daikinpromo-28d8a.firebaseapp.com",
+    databaseURL: "https://daikinpromo-28d8a-default-rtdb.firebaseio.com/",
+    projectId: "daikinpromo-28d8a",
+    storageBucket: "daikinpromo-28d8a.firebasestorage.app",
+    messagingSenderId: "949190921548",
+    appId: "1:949190921548:web:c1c9920190d4fa3ab153e9"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  window.submitToFirebase = async function(payload) {
+    try {
+      await push(ref(db, 'promoterSubmissions'), payload);
+      return { status: 'success' };
+    } catch (err) {
+      return { status: 'error', message: err.message };
+    }
+  };
+</script>
+
+<script>
+async function submitFinal() {
+  if (!validateTopDetails()) {
+    showMsg('Please fill all one-time basic details.', 'error');
+    return;
+  }
+
+  const totalCounterDisplay = document.getElementById('totalCounterDisplay').value.trim();
+  const daikinSplitDisplay = document.getElementById('daikinSplitDisplay').value.trim();
+  const installationCharges = document.getElementById('installationCharges').value.trim();
+  const pinelabActivation = document.getElementById('pinelabActivation').value.trim();
+  const paytmActivation = document.getElementById('paytmActivation').value.trim();
+  const paperFinance = document.getElementById('paperFinance').value.trim();
+
+  if (!totalCounterDisplay || !daikinSplitDisplay || !installationCharges || !pinelabActivation || !paytmActivation || !paperFinance) {
+    showMsg('Please fill all Store Information details.', 'error');
+    return;
+  }
+
+  if (!savedEntries.length) {
+    showMsg('Please save at least one entry before final submit.', 'error');
+    return;
+  }
+
+  showMsg('Submitting all saved entries, please wait...');
+
+  let successCount = 0;
+
+  for (const entry of savedEntries) {
+    const payload = {
+      submittedAt: new Date().toISOString(),
+      promoterName: document.getElementById('promoterName').value.trim(),
+      employeeCode: document.getElementById('employeeCode').value.trim(),
+      storeName: document.getElementById('storeName').value.trim(),
+      storeCode: document.getElementById('storeCode').value.trim(),
+      dealerCategory: document.getElementById('dealerCategory').value.trim(),
+      storeCity: document.getElementById('storeCity').value.trim(),
+      storeAddress: document.getElementById('storeAddress').value.trim(),
+      totalCounterDisplay: totalCounterDisplay,
+      daikinSplitDisplay: daikinSplitDisplay,
+      installationCharges: installationCharges,
+      pinelabActivation: pinelabActivation,
+      paytmActivation: paytmActivation,
+      paperFinance: paperFinance,
+      segment: entry.segment,
+      brand: entry.brand,
+      model: entry.model,
+      price: entry.price
+    };
+
+    const result = await window.submitToFirebase(payload);
+
+    if (result.status === 'success') {
+      successCount++;
+    } else {
+      showMsg('Submission failed: ' + result.message, 'error');
+      return;
+    }
+  }
+
+  showMsg('Final submission completed successfully. Rows saved: ' + successCount);
+  savedEntries = [];
+  renderEntries();
+  document.getElementById('totalCounterDisplay').value = '';
+  document.getElementById('daikinSplitDisplay').value = '';
+  document.getElementById('installationCharges').value = '';
+  document.getElementById('pinelabActivation').value = '';
+  document.getElementById('paytmActivation').value = '';
+  document.getElementById('paperFinance').value = '';
+}
+renderEntries();
+</script>
+</body>
+</html>
