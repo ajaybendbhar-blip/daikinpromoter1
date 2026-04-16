@@ -51,13 +51,19 @@
   <div class="box">
     <h3>Segment-wise entry</h3>
     <div class="grid">
-      <select id="segment">
-        <option value="">Select Segment</option>
-        <option>1T 3*</option>
-        <option>1.5T 3*</option>
-        <option>1T 5*</option>
-        <option>1.5T 5*</option>
+     <select id="segment">
+        <option value="">Select Inverter Ton/Star Category</option>
+        <option>1/1.2T 3*</option>
+        <option>1/1.2T 4*</option>
+        <option>1/1.2T 5*</option>
+        <option>1.4/1.5T 3*</option>
+        <option>1.4/1.5T 4*</option>
+        <option>1.4/1.5T 5*</option>
+        <option>1.8/2T 3*</option>
+        <option>1.8/2T 5*</option>
+        <option>Heavyduty above 2T</option>
       </select>
+
 
       <select id="brand">
         <option value="">Select Brand</option>
@@ -134,43 +140,74 @@
 
 <script>
 const modelMaster = {
-  '1T 3*': {
-    'Daikin': ['ATKL35XV', 'FTKL35XV','FTKC35XV'],
-    'LG': ['US-Q13JNYE', 'RS-Q13JNYE'],
-    'Voltas': ['183V Vectra', '123V Vertis'],
-    'Bluestar': ['IC312TNUR', 'IA312DNU'],
-    'Hitachi': ['3400FXL', '3400FRS'],
-    'Panasonic': ['CU/CS-XU12', 'CU/CS-PU12'],
-    'Llyod': ['GLS12I3FWAEV', 'GLW12B3XWSEW']
+  '1/1.2T 3*': {
+    'Panasonic': ['CSEU12CKY3F', 'CEEZ12CKYF', 'CSEU12CKY3FM'],
+    'Hitachi': ['RAS.G312PCDISS'],
+    'LG': ['AS-Q12CNXE', 'AS-Q12YNXE'],
+    'Bluestar': ['IA312BXUWK', 'IA312DXU', 'IA312EXU', 'IA312GXUS', 'IA312MXU', 'IA312NXU', 'IA312PXU', 'IA312QXU', 'IA312QXUS', 'IA312TXU', 'IA312UXUS', 'IA312VXU', 'IA312VXUS', 'IA312ZXU', 'IC312TXU'],
+    'Daikin': ['ATKL35XV', 'FTKL35XV', 'FTKN35XV', 'FTKC35XV'],
+    'Voltas': ['123 VECTRA ELEGANT', '123 VECTRA CREST', '123 VECTRA EMERALD', '123 VECTRA ZEN SILVAR', '123 VERTIES AI ZEST GOLD', '123 VERTIES ELITE RG', '123 VERTIES ELITE GOLD', '123 VERTIES ELITE'],
+    'Lloyd': ['GLS12V3ASNMR', 'GLS19I3AGAHF', 'GLS12I3AGESR', 'GLS12I3ASESR', 'GLS12I3AGASR', 'GLS12V3AGASR', 'GLS12I3AGCSR', 'GLS12I3ASCSR', 'GLS15I3ASCHR', 'GLS12I3ASAHC', 'GLS12I3ASHSC', 'GLS12I3ASHSR', 'GLS12I3ASISR', 'GLS12I3ASJSR']
   },
-  '1.5T 3*': {
-    'Daikin': ['ATKL50XV', 'FTKL50XV','FTKC50XV'],
-    'LG': ['US-Q18JNXE', 'RS-Q18JNXE'],
-    'Voltas': ['183V Vectra Elite', '183V Vertis'],
-    'Bluestar': ['IC318TNU', 'IA318DNU'],
-    'Hitachi': ['518PCAISL', '518PCAIB'],
-    'Panasonic': ['CU/CS-PU18', 'CU/CS-XU18'],
-    'Llyod': ['GLS18I3FWAEV', 'GLW18B3XWSEW']
+  '1/1.2T 4*': {
+    'Panasonic': ['CSEU12CKY4FM'],
+    'LG': ['AS-Q13JNYE'],
+    'Lloyd': ['GLS12I5FWCGR', 'GLS12I5FOCGR']
   },
-  '1T 5*': {
-    'Daikin': ['MTKM35XV', 'FTKM35XV','FTKU35XV','JTKJ35XV'],
-    'LG': ['US-Q13HNZE', 'RS-Q13HNZE'],
-    'Voltas': ['125V Vectra', '125V Vertis'],
-    'Bluestar': ['IC512YNU', 'IA512DNU'],
-    'Hitachi': ['3400FOS', '3400FSL'],
-    'Panasonic': ['CU/CS-XU12AKY', 'CU/CS-NU12'],
-    'Llyod': ['GLS12I5FWBEV', 'GLW12C5XWSEW']
+  '1/1.2T 5*': {
+    'Panasonic': ['CSEU12CKY5FM', 'CSHU12CKY5FM', 'CSEU12CKY5F'],
+    'Hitachi': ['RAS.V512PCDIST'],
+    'Bluestar': ['IA512BXUWK', 'IA512DXU', 'IA512EXU', 'IA512GXUS', 'IA512NXUS', 'IA512PXU', 'IA512QXUAVS', 'IA512QXUS', 'IA512TXU', 'IA512UXUS', 'IA512ZXUS'],
+    'Daikin': ['ATKM35XV', 'FTKM35XV', 'JTKJ35XV', 'FTKF35XV', 'FTKU35XV', 'FTKR35XV'],
+    'Voltas': ['125 VERTIES AI ZEST GOLD'],
+    'Lloyd': ['GLS12V6ASOQZ', 'GLS12V5GSNMR', 'GLS12I5GGEGR', 'GLS12I5GSEGR', 'GLS12I5GGCGR', 'GLS12I5GSCGR', 'GLS12I5GSIGR', 'GLS12I5GSJGR']
   },
-  '1.5T 5*': {
-    'Daikin': ['MTKM50XV', 'FTKM50XV','FTKU50XV','JTKJ50XV'],
-    'LG': ['US-Q19HNZE', 'RS-Q19HNZE'],
-    'Voltas': ['185V Vectra', '185V Vertis'],
-    'Bluestar': ['IC518YNU', 'IA518DNU'],
-    'Hitachi': ['518FOBISL', '518FOBIB'],
-    'Panasonic': ['CU/CS-XU18AKY', 'CU/CS-NU18'],
-    'Llyod': ['GLS18I5FWBEV', 'GLW18C5XWSEW']
+  '1.4/1.5T 3*': {
+    'Panasonic': ['CSEU18CKY3FH', 'CEEZ18CKYF', 'CSEZ18CKYXFM', 'CSEU18CKYX3FMH', 'CSEU18CKY3XFH'],
+    'Hitachi': ['RAS.318PCD3SM', 'RAS.Y319PCDISL', 'RAS.G318PHDIST', 'RAS.318PCDISM1', 'RAS.D318PCD2ST', 'RAS.V318PCDIST'],
+    'LG': ['AS-Q18TNXE', 'AS-Q18TNXE1', 'AS-Q19MNXE', 'AS-Q18JNXE', 'AS-Q18DNXE', 'AS-Q19WNXE', 'AS-Q19CNXE', 'AS-Q19PNXE', 'AS-Q18ANXE', 'AS-Q19HNXE', 'AS-Q18LNXE', 'AS-Q19QNXE', 'AS-Q18ZNXE', 'AS-Q18HWXE', 'AS-Q18CWXE', 'AS-Q19XNXE', 'AS-Q19KWXE2', 'AS-Q18YNXE'],
+    'Bluestar': ['IA318BXUWK', 'IA318DXU', 'IA318EXU', 'IA318GXU', 'IA318GXUS', 'IA318MXU', 'IA318MXUS', 'IA318NXUS', 'IA318PXU', 'IA318QXU', 'IA318QXUS', 'IA318TXU', 'IA318UXUS', 'IA318VXU', 'IA318VXUS'],
+    'Daikin': ['ATKL50XV', 'FTKL50XV', 'FTKN50XV', 'FTKC48XV', 'FTKC60XV'],
+    'Voltas': ['183 VECTRA ZEN SILVER', '183 VECTRA ZENITH SILVER', '183 VENUS LUXE', '183 VECTRA ZEHITH(H & C)', '183 VERTIES ZEN GOLD', '183 VERTIES ZENITH GOLD', '183 VERTIES ZEPHYR', '186 VERTIS CREST MARVEL', '183 VERTIES AI ZEST GOLD'],
+    'Lloyd': ['GLS18V3ASNMR', 'GLS19I3ASASX', 'GLS19I3ASAHF', 'GLS19I3AGFSF', 'GLS18I3AGESW', 'GLS18I3AGESR', 'GLS18I3ASESR', 'GLS18I3AGASR', 'GLS18V3AGASR', 'GLS18I3AGCSW', 'GLS18I3ASCSW', 'GLS18I3AGCSR', 'GLS18I3ASCSR', 'GLS18I3AGCHC', 'GLS18I3BGCHC', 'GLS18I3ASCHC', 'GLS18I3AGHSR', 'GLS18I3ASISW', 'GLS18I3ASISR', 'GLS18I3ASNMW', 'GLS18I3ASJSW', 'GLS18I3ASJSR', 'GLS18I3AGDSC', 'GLS18I3AGDSW', 'GLS18I3AGDSR', 'GLS18H3AGARR', 'GLS19H3AGARF']
+  },
+  '1.4/1.5T 4*': {
+    'Panasonic': ['CSWU18CKY4XFM', 'CSEU18CKY4XFM'],
+    'Hitachi': ['RAS.G418PHDIST'],
+    'LG': ['AS-Q19JNYE'],
+    'Lloyd': ['GLS18H5FWKGT', 'GLS18I5KOCGR', 'GLS18I5KWFGR']
+  },
+  '1.4/1.5T 5*': {
+    'Panasonic': ['CSHU18CKY5XFMH', 'CSEU18CKY5XF', 'CSEU18CKY5XFM'],
+    'Hitachi': ['RAS.X518PCDISM1', 'RAS.Y519PCDISL', 'RAS.V518PCDIST'],
+    'LG': ['AS-Q20JWZE', 'AS-Q20ENZE'],
+    'Bluestar': ['IA518ZXUS', 'IA518BXUWK', 'IA518DXU', 'IA518EXU', 'IA518GXUS', 'IA518NXUS', 'IA518PXU', 'IA518QXUAVS', 'IA518QXUS', 'IA518TXU', 'IA518UXUS'],
+    'Daikin': ['ATKM50XV', 'FTKM50XV', 'JTKJ50XV', 'FTKF50XV', 'FTKU50XV', 'FTKR50XV'],
+    'Voltas': ['185 VENUS LUXE', '185 VERTIES AI ZEST GOLD', '185 VERTIES ELITE GOLD', '185 VERTIES ELITE'],
+    'Lloyd': ['GLS19V5ASOQZ', 'GLS18V5AGKST', 'GLS19V5AGKGT', 'GLS19V5AGLGT', 'GLS19V5AGMGT', 'GLS18V5ASNMR', 'GLS19I5AGAGX', 'GLS19I5AGAHF', 'GLS19I5ASAHF', 'GLS18I5AGERW', 'GLS18I5ASEGW', 'GLS18I5AGERR', 'GLS18I5ASERR', 'GLS18I5AGCGW', 'GLS18I5ASCGW', 'GLS18I5AGCGR', 'GLS18I5ASCGR', 'GLS18I5AGHGW', 'GLS18I5ASHGW', 'GLS18I5AGHGR', 'GLS18I5ASHGR', 'GLS18I5ASIGW', 'GLS18I5ASIGR', 'GLS18I5ASJGW', 'GLS18I5ASJGR', 'GLS18I5AGDGW', 'GLS18I5AGDGR', 'GLS19H5AGARF']
+  },
+  '1.8/2T 3*': {
+    'Panasonic': ['CSEU24CKY3F', 'CSEZ24CKYFM', 'CSEU24CKY3FM', 'CSEU18CKY3F'],
+    'Hitachi': ['RAS.Y324PCDISL', 'RAS.V322PCDIST'],
+    'LG': ['AS-Q24ENXE', 'AS-Q24EWXE'],
+    'Bluestar': ['IA322BXUWK', 'IA322DXU', 'IA322EXU', 'IA322GXUS', 'IA322QXUS', 'IA322TXU', 'IA322VXUS', 'IA324DXU', 'IA324VXUS'],
+    'Daikin': ['ATKL60XV', 'FTKL60XV'],
+    'Voltas': ['243 VECTRA ELEGANT'],
+    'Lloyd': ['GLS24V3GGKST', 'GLS24I3GGCSR', 'GLS24I3GGCHC', 'GLS24I3GSCHC', 'GLS24H3GGARR']
+  },
+  '1.8/2T 5*': {
+    'Panasonic': ['CSEU24CKY5FH', 'CSEU24CKY5FM', 'CSZU24CKY5FM'],
+    'Bluestar': ['IA522GXUS', 'IA522UXUS'],
+    'Daikin': ['ATKM60XV', 'FTKM60XV', 'JTKJ60XV', 'FTKF60XV', 'FTKR60XV'],
+    'Lloyd': ['GLS24I5AGCGR']
+  },
+  'Heavyduty above 2T': {
+    'Panasonic': ['CSQU30CKYFM'],
+    'Daikin': ['FTKL71XV', 'FTKL90XV'],
+    'Lloyd': ['GLS27I3FWSHD']
   }
 };
+
 
 let savedEntries = [];
 
