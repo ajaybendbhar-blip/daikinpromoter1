@@ -112,6 +112,22 @@
   </div>
 
   <div class="box">
+    <h3>Reference Customer Invoice</h3>
+    <div class="grid">
+      <div style="grid-column:1/-1;">
+        <label for="invoiceImage"><b>Upload Reference Customer Invoice</b> (Optional)</label>
+        <input id="invoiceImage" type="file" accept="image/*" capture="environment">
+        <small style="display:block;margin-top:6px;color:#666;">
+          Promoter can upload from computer, mobile gallery, or click a picture from camera.
+        </small>
+      </div>
+      <div style="grid-column:1/-1;">
+        <img id="invoicePreview" alt="Invoice Preview" style="max-width:260px; display:none; border:1px solid #ccc; border-radius:8px; margin-top:8px;">
+      </div>
+    </div>
+  </div>
+
+  <div class="box">
     <button type="button" onclick="submitFinal()">Final Submit</button>
   </div>
 </div>
@@ -157,6 +173,41 @@ const modelMaster = {
 };
 
 let savedEntries = [];
+
+
+let invoiceImageBase64 = '';
+let invoiceImageMimeType = '';
+let invoiceImageName = '';
+
+document.getElementById('invoiceImage').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    showMsg('Please select only an image file for invoice.', 'error');
+    event.target.value = '';
+    invoiceImageBase64 = '';
+    invoiceImageMimeType = '';
+    invoiceImageName = '';
+    document.getElementById('invoicePreview').style.display = 'none';
+    return;
+  }
+
+  invoiceImageMimeType = file.type || 'image/jpeg';
+  invoiceImageName = file.name || ('invoice_' + Date.now() + '.jpg');
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const result = e.target.result;
+    invoiceImageBase64 = result.split(',')[1];
+
+    const preview = document.getElementById('invoicePreview');
+    preview.src = result;
+    preview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
 
 function showMsg(text, type='ok') {
   const el = document.getElementById('msg');
