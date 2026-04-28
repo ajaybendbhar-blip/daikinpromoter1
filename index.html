@@ -6,13 +6,18 @@
   <title>Daikin Market Masters</title>
   <style>
     body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0;padding:20px}
-    .wrap{max-width:900px;margin:auto;background:#fff;padding:20px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
-    h1,h2{margin-top:0;color:#0f4c5c}
+    .wrap{max-width:960px;margin:auto;background:#fff;padding:20px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+    h1,h2,h3{margin-top:0;color:#0f4c5c}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    input,select,button,textarea{width:100%;padding:12px;border:1px solid #cfd8e3;border-radius:10px;box-sizing:border-box}
-    textarea{min-height:80px}.section{border:1px solid #e3e8ef;border-radius:12px;padding:16px;margin-bottom:16px}
-    .msg{display:none;padding:12px;border-radius:10px;margin-bottom:12px}.ok{display:block;background:#e8f7ee;color:#126a36}.err{display:block;background:#fdecef;color:#a42843}
-    .entry{border:1px dashed #c8d1dc;border-radius:10px;padding:12px;margin-top:10px}.small{font-size:12px;color:#667085}.preview-list div{font-size:12px;padding:4px 0}
+    input,select,button{width:100%;padding:12px;border:1px solid #cfd8e3;border-radius:10px;box-sizing:border-box;background:#fff}
+    .section{border:1px solid #e3e8ef;border-radius:12px;padding:16px;margin-bottom:16px}
+    .msg{display:none;padding:12px;border-radius:10px;margin-bottom:12px}
+    .ok{display:block;background:#e8f7ee;color:#126a36}
+    .err{display:block;background:#fdecef;color:#a42843}
+    .entry{border:1px dashed #c8d1dc;border-radius:10px;padding:12px;margin-top:10px}
+    .small{font-size:12px;color:#667085}
+    .preview-list div{font-size:12px;padding:4px 0}
+    .hidden{display:none !important}
     @media(max-width:768px){.grid{grid-template-columns:1fr}}
   </style>
 </head>
@@ -21,7 +26,7 @@
   <h1>Daikin Market Masters</h1>
   <div id="msg" class="msg"></div>
 
-  <div class="section">
+  <div id="loginSection" class="section">
     <h2>Promoter Login</h2>
     <div class="grid">
       <input id="employeeCode" placeholder="Employee Code / Mobile Number">
@@ -30,7 +35,14 @@
     <div style="margin-top:12px"><button onclick="login()">Login</button></div>
   </div>
 
-  <div id="formArea" style="display:none">
+  <div id="userBar" class="section hidden">
+    <div class="grid">
+      <input id="loggedPromoter" readonly>
+      <input id="loggedStore" readonly>
+    </div>
+  </div>
+
+  <div id="formArea" class="hidden">
     <div class="section">
       <h2>One-time basic details</h2>
       <div class="grid">
@@ -46,9 +58,9 @@
     <div class="section">
       <h2>Brand-wise entry</h2>
       <div class="grid">
-        <input id="brand" placeholder="Brand">
-        <input id="segment" placeholder="Segment">
-        <input id="model" placeholder="Model Number">
+        <select id="brand"><option value="">Select Brand</option></select>
+        <select id="segment"><option value="">Select Segment</option></select>
+        <select id="model"><option value="">Select Model Number</option></select>
         <input id="price" placeholder="Best Customer Price">
       </div>
       <div style="margin-top:12px">
@@ -76,23 +88,461 @@
   </div>
 </div>
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz2bH2lQ-LvsXOOkSCVQUJBVb57EfkZcu1YXlzhfQ3FYJ2ZQZqOhvEwnnzPqZNO8pjo/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBRqeB4_m7FM63f565XDmiSbm1mi3Ppnkw99yszJNSVkWHGXLdBZaxJDbQqeArUB8/exec';
+const modelMaster = {
+  "1.4/1.5T 3*": {
+    "Panasonic": [
+      "CSEU18CKY3FH",
+      "CEEZ18CKYF",
+      "CSEZ18CKYXFM",
+      "CSEU18CKYX3FMH",
+      "CSEU18CKY3XFH"
+    ],
+    "Hitachi": [
+      "RAS.318PCD3SM",
+      "RAS.Y319PCDISL",
+      "RAS.G318PHDIST",
+      "RAS.318PCDISM1",
+      "RAS.D318PCD2ST",
+      "RAS.V318PCDIST"
+    ],
+    "LG": [
+      "AS-Q18TNXE",
+      "AS-Q18TNXE1",
+      "AS-Q19MNXE",
+      "AS-Q18JNXE",
+      "AS-Q18DNXE",
+      "AS-Q19WNXE",
+      "AS-Q19CNXE",
+      "AS-Q19PNXE",
+      "AS-Q18ANXE",
+      "AS-Q19HNXE",
+      "AS-Q18LNXE",
+      "AS-Q19QNXE",
+      "AS-Q18ZNXE",
+      "AS-Q18HWXE",
+      "AS-Q18CWXE",
+      "AS-Q19XNXE",
+      "AS-Q19KWXE2",
+      "AS-Q18YNXE"
+    ],
+    "Bluestar": [
+      "IA318BXUWK",
+      "IA318DXU",
+      "IA318EXU",
+      "IA318GXU",
+      "IA318GXUS",
+      "IA318MXU",
+      "IA318MXUS",
+      "IA318NXUS",
+      "IA318PXU",
+      "IA318QXU",
+      "IA318QXUS",
+      "IA318TXU",
+      "IA318UXUS",
+      "IA318VXU",
+      "IA318VXUS"
+    ],
+    "Daikin": [
+      "ATKL50XV",
+      "FTKL50XV",
+      "FTKN50XV",
+      "FTKC48XV",
+      "FTKC60XV"
+    ],
+    "Voltas": [
+      "183 VECTRA ZEN SILVER",
+      "183 VECTRA ZENITH SILVER",
+      "183 VENUS LUXE",
+      "183 VECTRA ZEHITH(H & C)",
+      "183 VERTIES ZEN GOLD",
+      "183 VERTIES ZENITH GOLD",
+      "183 VERTIES ZEPHYR",
+      "186 VERTIS CREST MARVEL",
+      "183 VERTIES AI ZEST GOLD"
+    ],
+    "Lloyd": [
+      "GLS18V3ASNMR",
+      "GLS19I3ASASX",
+      "GLS19I3ASAHF",
+      "GLS19I3AGFSF",
+      "GLS18I3AGESW",
+      "GLS18I3AGESR",
+      "GLS18I3ASESR",
+      "GLS18I3AGASR",
+      "GLS18V3AGASR",
+      "GLS18I3AGCSW",
+      "GLS18I3ASCSW",
+      "GLS18I3AGCSR",
+      "GLS18I3ASCSR",
+      "GLS18I3AGCHC",
+      "GLS18I3BGCHC",
+      "GLS18I3ASCHC",
+      "GLS18I3AGHSR",
+      "GLS18I3ASISW",
+      "GLS18I3ASISR",
+      "GLS18I3ASNMW",
+      "GLS18I3ASJSW",
+      "GLS18I3ASJSR",
+      "GLS18I3AGDSC",
+      "GLS18I3AGDSW",
+      "GLS18I3AGDSR",
+      "GLS18H3AGARR",
+      "GLS19H3AGARF"
+    ]
+  },
+  "1.4/1.5T 4*": {
+    "Panasonic": [
+      "CSWU18CKY4XFM",
+      "CSEU18CKY4XFM"
+    ],
+    "Hitachi": [
+      "RAS.G418PHDIST"
+    ],
+    "LG": [
+      "AS-Q19JNYE"
+    ],
+    "Lloyd": [
+      "GLS18H5FWKGT",
+      "GLS18I5KOCGR",
+      "GLS18I5KWFGR"
+    ]
+  },
+  "1.4/1.5T 5*": {
+    "Panasonic": [
+      "CSHU18CKY5XFMH",
+      "CSEU18CKY5XF",
+      "CSEU18CKY5XFM"
+    ],
+    "Hitachi": [
+      "RAS.X518PCDISM1",
+      "RAS.Y519PCDISL",
+      "RAS.V518PCDIST"
+    ],
+    "LG": [
+      "AS-Q20JWZE",
+      "AS-Q20ENZE"
+    ],
+    "Bluestar": [
+      "IA518ZXUS",
+      "IA518BXUWK",
+      "IA518DXU",
+      "IA518EXU",
+      "IA518GXUS",
+      "IA518NXUS",
+      "IA518PXU",
+      "IA518QXUAVS",
+      "IA518QXUS",
+      "IA518TXU",
+      "IA518UXUS"
+    ],
+    "Daikin": [
+      "ATKM50XV",
+      "FTKM50XV",
+      "JTKJ50XV",
+      "FTKF50XV",
+      "FTKU50XV",
+      "FTKR50XV"
+    ],
+    "Voltas": [
+      "185 VENUS LUXE",
+      "185 VERTIES AI ZEST GOLD",
+      "185 VERTIES ELITE GOLD",
+      "185 VERTIES ELITE"
+    ],
+    "Lloyd": [
+      "GLS19V5ASOQZ",
+      "GLS18V5AGKST",
+      "GLS19V5AGKGT",
+      "GLS19V5AGLGT",
+      "GLS19V5AGMGT",
+      "GLS18V5ASNMR",
+      "GLS19I5AGAGX",
+      "GLS19I5AGAHF",
+      "GLS19I5ASAHF",
+      "GLS18I5AGERW",
+      "GLS18I5ASEGW",
+      "GLS18I5AGERR",
+      "GLS18I5ASERR",
+      "GLS18I5AGCGW",
+      "GLS18I5ASCGW",
+      "GLS18I5AGCGR",
+      "GLS18I5ASCGR",
+      "GLS18I5AGHGW",
+      "GLS18I5ASHGW",
+      "GLS18I5AGHGR",
+      "GLS18I5ASHGR",
+      "GLS18I5ASIGW",
+      "GLS18I5ASIGR",
+      "GLS18I5ASJGW",
+      "GLS18I5ASJGR",
+      "GLS18I5AGDGW",
+      "GLS18I5AGDGR",
+      "GLS19H5AGARF"
+    ]
+  },
+  "1.8/2T 3*": {
+    "Panasonic": [
+      "CSEU24CKY3F",
+      "CSEZ24CKYFM",
+      "CSEU24CKY3FM",
+      "CSEU18CKY3F"
+    ],
+    "Hitachi": [
+      "RAS.Y324PCDISL",
+      "RAS.V322PCDIST"
+    ],
+    "LG": [
+      "AS-Q24ENXE",
+      "AS-Q24EWXE"
+    ],
+    "Bluestar": [
+      "IA322BXUWK",
+      "IA322DXU",
+      "IA322EXU",
+      "IA322GXUS",
+      "IA322QXUS",
+      "IA322TXU",
+      "IA322VXUS",
+      "IA324DXU",
+      "IA324VXUS"
+    ],
+    "Daikin": [
+      "ATKL60XV",
+      "FTKL60XV"
+    ],
+    "Voltas": [
+      "243 VECTRA ELEGANT"
+    ],
+    "Lloyd": [
+      "GLS24V3GGKST",
+      "GLS24I3GGCSR",
+      "GLS24I3GGCHC",
+      "GLS24I3GSCHC",
+      "GLS24H3GGARR"
+    ]
+  },
+  "1.8/2T 5*": {
+    "Panasonic": [
+      "CSEU24CKY5FH",
+      "CSEU24CKY5FM",
+      "CSZU24CKY5FM"
+    ],
+    "Bluestar": [
+      "IA522GXUS",
+      "IA522UXUS"
+    ],
+    "Daikin": [
+      "ATKM60XV",
+      "FTKM60XV",
+      "JTKJ60XV",
+      "FTKF60XV",
+      "FTKR60XV"
+    ],
+    "Lloyd": [
+      "GLS24I5AGCGR"
+    ]
+  },
+  "1/1.2T 3*": {
+    "Panasonic": [
+      "CSEU12CKY3F",
+      "CEEZ12CKYF",
+      "CSEU12CKY3FM"
+    ],
+    "Hitachi": [
+      "RAS.G312PCDISS"
+    ],
+    "LG": [
+      "AS-Q12CNXE",
+      "AS-Q12YNXE"
+    ],
+    "Bluestar": [
+      "IA312BXUWK",
+      "IA312DXU",
+      "IA312EXU",
+      "IA312GXUS",
+      "IA312MXU",
+      "IA312NXU",
+      "IA312PXU",
+      "IA312QXU",
+      "IA312QXUS",
+      "IA312TXU",
+      "IA312UXUS",
+      "IA312VXU",
+      "IA312VXUS",
+      "IA312ZXU",
+      "IC312TXU"
+    ],
+    "Daikin": [
+      "ATKL35XV",
+      "FTKL35XV",
+      "FTKN35XV",
+      "FTKC35XV"
+    ],
+    "Voltas": [
+      "123 VECTRA ELEGANT",
+      "123 VECTRA CREST",
+      "123 VECTRA EMERALD",
+      "123 VECTRA ZEN SILVAR",
+      "123 VERTIES AI ZEST GOLD",
+      "123 VERTIES ELITE RG",
+      "123 VERTIES ELITE GOLD",
+      "123 VERTIES ELITE"
+    ],
+    "Lloyd": [
+      "GLS12V3ASNMR",
+      "GLS19I3AGAHF",
+      "GLS12I3AGESR",
+      "GLS12I3ASESR",
+      "GLS12I3AGASR",
+      "GLS12V3AGASR",
+      "GLS12I3AGCSR",
+      "GLS12I3ASCSR",
+      "GLS15I3ASCHR",
+      "GLS12I3ASAHC",
+      "GLS12I3ASHSC",
+      "GLS12I3ASHSR",
+      "GLS12I3ASISR",
+      "GLS12I3ASJSR"
+    ]
+  },
+  "1/1.2T 4*": {
+    "Panasonic": [
+      "CSEU12CKY4FM"
+    ],
+    "LG": [
+      "AS-Q13JNYE"
+    ],
+    "Lloyd": [
+      "GLS12I5FWCGR",
+      "GLS12I5FOCGR"
+    ]
+  },
+  "1/1.2T 5*": {
+    "Panasonic": [
+      "CSEU12CKY5FM",
+      "CSHU12CKY5FM",
+      "CSEU12CKY5F"
+    ],
+    "Hitachi": [
+      "RAS.V512PCDIST"
+    ],
+    "Bluestar": [
+      "IA512BXUWK",
+      "IA512DXU",
+      "IA512EXU",
+      "IA512GXUS",
+      "IA512NXUS",
+      "IA512PXU",
+      "IA512QXUAVS",
+      "IA512QXUS",
+      "IA512TXU",
+      "IA512UXUS",
+      "IA512ZXUS"
+    ],
+    "Daikin": [
+      "ATKM35XV",
+      "FTKM35XV",
+      "JTKJ35XV",
+      "FTKF35XV",
+      "FTKU35XV",
+      "FTKR35XV"
+    ],
+    "Voltas": [
+      "125 VERTIES AI ZEST GOLD"
+    ],
+    "Lloyd": [
+      "GLS12V6ASOQZ",
+      "GLS12V5GSNMR",
+      "GLS12I5GGEGR",
+      "GLS12I5GSEGR",
+      "GLS12I5GGCGR",
+      "GLS12I5GSCGR",
+      "GLS12I5GSIGR",
+      "GLS12I5GSJGR"
+    ]
+  },
+  "Heavyduty above 2T": {
+    "Panasonic": [
+      "CSQU30CKYFM"
+    ],
+    "Daikin": [
+      "FTKL71XV",
+      "FTKL90XV"
+    ],
+    "Lloyd": [
+      "GLS27I3FWSHD"
+    ]
+  }
+};
 let savedEntries = [];
 let loggedInEmployee = null;
 const IMAGE_MAX_WIDTH = 1280;
 const IMAGE_MAX_HEIGHT = 1280;
 const IMAGE_QUALITY = 0.72;
 
-function showMsg(text, type='ok'){ const el=document.getElementById('msg'); el.className='msg ' + (type==='error'?'err':'ok'); el.textContent=text; }
+function showMsg(text, type='ok'){
+  const el = document.getElementById('msg');
+  el.className = 'msg ' + (type === 'error' ? 'err' : 'ok');
+  el.textContent = text;
+}
+
+function uniqueBrands(){
+  const brands = new Set();
+  Object.values(modelMaster).forEach(group => Object.keys(group || {}).forEach(b => brands.add(b)));
+  return [...brands].sort();
+}
+
+function populateBrandOptions(){
+  const brand = document.getElementById('brand');
+  brand.innerHTML = '<option value="">Select Brand</option>';
+  uniqueBrands().forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b;
+    opt.textContent = b;
+    brand.appendChild(opt);
+  });
+}
+
+function populateSegmentOptions(){
+  const brand = document.getElementById('brand').value;
+  const segment = document.getElementById('segment');
+  const model = document.getElementById('model');
+  segment.innerHTML = '<option value="">Select Segment</option>';
+  model.innerHTML = '<option value="">Select Model Number</option>';
+  if (!brand) return;
+  Object.keys(modelMaster).forEach(seg => {
+    if (modelMaster[seg] && modelMaster[seg][brand] && modelMaster[seg][brand].length) {
+      const opt = document.createElement('option');
+      opt.value = seg;
+      opt.textContent = seg;
+      segment.appendChild(opt);
+    }
+  });
+}
+
+function populateModels(){
+  const brand = document.getElementById('brand').value;
+  const segment = document.getElementById('segment').value;
+  const model = document.getElementById('model');
+  model.innerHTML = '<option value="">Select Model Number</option>';
+  if (!brand || !segment || !modelMaster[segment] || !modelMaster[segment][brand]) return;
+  modelMaster[segment][brand].forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = m;
+    model.appendChild(opt);
+  });
+}
 
 async function login(){
   try {
     const employeeCode = document.getElementById('employeeCode').value.trim();
     const password = document.getElementById('password').value.trim();
-    if(!employeeCode || !password){ showMsg('Enter employee code and password','error'); return; }
+    if (!employeeCode || !password) { showMsg('Enter employee code and password', 'error'); return; }
     const res = await fetch(`${APPS_SCRIPT_URL}?employeeCode=${encodeURIComponent(employeeCode)}&password=${encodeURIComponent(password)}`);
     const json = await res.json();
-    if(!json.success) throw new Error(json.message || 'Login failed');
+    if (!json.success) throw new Error(json.message || 'Login failed');
     loggedInEmployee = json.employee;
     document.getElementById('promoterName').value = json.employee.promoterName || '';
     document.getElementById('storeName').value = json.employee.storeName || '';
@@ -100,15 +550,22 @@ async function login(){
     document.getElementById('dealerCategory').value = json.employee.dealerCategory || '';
     document.getElementById('storeCity').value = json.employee.storeCity || '';
     document.getElementById('storeAddress').value = json.employee.storeAddress || '';
-    document.getElementById('formArea').style.display = 'block';
+    document.getElementById('loggedPromoter').value = 'Promoter: ' + (json.employee.promoterName || '');
+    document.getElementById('loggedStore').value = 'Store: ' + (json.employee.storeName || '');
+    document.getElementById('loginSection').classList.add('hidden');
+    document.getElementById('userBar').classList.remove('hidden');
+    document.getElementById('formArea').classList.remove('hidden');
     showMsg('Login successful');
-  } catch(err){ showMsg(err.message,'error'); }
+  } catch(err) { showMsg(err.message, 'error'); }
 }
+
+document.getElementById('brand').addEventListener('change', populateSegmentOptions);
+document.getElementById('segment').addEventListener('change', populateModels);
 
 function updateInvoicePreview(files){
   const preview = document.getElementById('invoicePreview');
   preview.innerHTML = '';
-  [...files].slice(0,7).forEach((file, i)=>{
+  [...files].slice(0,7).forEach((file, i) => {
     const div = document.createElement('div');
     div.textContent = `${i+1}. ${file.name} | Original: ${Math.round(file.size/1024)} KB | Will compress on submit`;
     preview.appendChild(div);
@@ -126,18 +583,23 @@ function saveEntry(){
     invoiceFileObjects: files,
     invoiceFilesMeta: files.map(f => ({name:f.name, size:f.size, type:f.type}))
   };
-  if(!entry.brand || !entry.segment || !entry.model || !entry.price){ showMsg('Fill all brand entry fields','error'); return; }
+  if (!entry.brand || !entry.segment || !entry.model || !entry.price) { showMsg('Fill brand, segment, model number and price', 'error'); return; }
   savedEntries.push(entry);
   renderEntries();
-  ['brand','segment','model','price','invoiceImages'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('brand').value = '';
+  document.getElementById('segment').innerHTML = '<option value="">Select Segment</option>';
+  document.getElementById('model').innerHTML = '<option value="">Select Model Number</option>';
+  document.getElementById('price').value = '';
+  document.getElementById('invoiceImages').value = '';
   document.getElementById('invoicePreview').innerHTML = '';
   showMsg('Entry saved locally');
 }
 
 function renderEntries(){
   const box = document.getElementById('entriesList');
+  if (!savedEntries.length) { box.innerHTML = ''; return; }
   box.innerHTML = '<h3>Saved entries</h3>';
-  savedEntries.forEach((e, i)=>{
+  savedEntries.forEach((e, i) => {
     const div = document.createElement('div');
     div.className = 'entry';
     div.innerHTML = `<b>${i+1}. ${e.brand}</b><br>Segment: ${e.segment}<br>Model: ${e.model}<br>Price: ${e.price}<br>Invoices: ${e.invoiceFilesMeta.length}`;
@@ -146,7 +608,7 @@ function renderEntries(){
 }
 
 function loadImage(file){
-  return new Promise((resolve, reject)=>{
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       const img = new Image();
@@ -187,17 +649,15 @@ async function compressImage(file){
 
 async function submitFinal(){
   try {
-    if(!loggedInEmployee) throw new Error('Please login first');
-    if(savedEntries.length === 0) throw new Error('Please save at least one brand entry');
-
+    if (!loggedInEmployee) throw new Error('Please login first');
+    if (savedEntries.length === 0) throw new Error('Please save at least one brand entry');
     showMsg('Compressing images and submitting...');
     const entriesPayload = [];
     let totalOriginal = 0;
     let totalCompressed = 0;
-
-    for(const entry of savedEntries){
+    for (const entry of savedEntries) {
       const invoiceImages = [];
-      for(const f of entry.invoiceFileObjects){
+      for (const f of entry.invoiceFileObjects) {
         const compressed = await compressImage(f);
         totalOriginal += compressed.originalSize;
         totalCompressed += compressed.compressedSize;
@@ -211,7 +671,6 @@ async function submitFinal(){
         invoiceImages
       });
     }
-
     const payload = {
       promoterName: document.getElementById('promoterName').value,
       employeeCode: document.getElementById('employeeCode').value.trim(),
@@ -228,22 +687,22 @@ async function submitFinal(){
       paperFinance: document.getElementById('paperFinance').value,
       entries: entriesPayload
     };
-
     const res = await fetch(APPS_SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      method: 'POST',
+      headers: {'Content-Type':'text/plain;charset=utf-8'},
       body: JSON.stringify(payload)
     });
     const json = await res.json();
-    if(!json.success) throw new Error(json.message || json.error || 'Submit failed');
-
+    if (!json.success) throw new Error(json.message || json.error || 'Submit failed');
     const beforeKB = Math.round(totalOriginal/1024);
     const afterKB = Math.round(totalCompressed/1024);
     showMsg(`Final submit successful. Image size reduced from ${beforeKB} KB to ${afterKB} KB before upload.`);
     savedEntries = [];
     renderEntries();
-  } catch(err){ showMsg(err.message,'error'); }
+  } catch(err) { showMsg(err.message, 'error'); }
 }
+
+populateBrandOptions();
 </script>
 </body>
 </html>
