@@ -683,7 +683,7 @@ async function loginPromoter() {
   }
 
   try {
-    const url = 'https://script.google.com/macros/s/AKfycbyF1tvgY_QcxV9SwY9I9QJjJkQBnQtSmCqtRNrX8S2a8J_dX5wsFMDNwQImV-JsHIyO/exec?employeeCode=' + encodeURIComponent(employeeCode) + '&password=' + encodeURIComponent(password);
+    const url = 'https://script.google.com/macros/s/AKfycbw4tp-pAykbiqCksYgb7Eb_NHLgIT2LGXSALJoC7-xA_Y2H7I1-Brlkw4aipqRT8UQy/exec?employeeCode=' + encodeURIComponent(employeeCode) + '&password=' + encodeURIComponent(password);
     const res = await fetch(url);
     const data = await res.json();
 
